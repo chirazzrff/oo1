@@ -11,6 +11,13 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
   final _formKey = GlobalKey<FormState>();
   final supabase = Supabase.instance.client;
 
+  // Dégradé de fond
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   // Text controllers
   final fullNameController = TextEditingController();
   final dobController = TextEditingController();
@@ -70,11 +77,8 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
 
       // 2. Insérer le paiement dans la table pyment
       final paymentInsert = await supabase.from('pyment').insert({
-
-        
-        'pyment_date':dateSheet,
+        'pyment_date': dateSheet,
         'child_id': childId,
-        
         'amount': double.parse(amountController.text),
         'method': _paymentMethod,
         'status': 'Pending',
@@ -101,58 +105,60 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Child Registration'),
         backgroundColor: Colors.blueAccent,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildSectionTitle('👶 Child Info'),
-              _buildField(Icons.person, 'Full Name', controller: fullNameController),
-              _buildField(Icons.calendar_today, 'Date of Birth', controller: dobController),
-              _buildDropdown(Icons.school, 'Select Class', classes, onChanged: (val) => _selectedClass = val),
-              _buildDropdown(Icons.book, 'Select Course', courses, onChanged: (val) => _selectedCourse = val),
+      body: Container(
+        decoration: BoxDecoration(gradient: backgroundGradient),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildSectionTitle('👶 Child Info'),
+                _buildField(Icons.person, 'Full Name', controller: fullNameController),
+                _buildField(Icons.calendar_today, 'Date of Birth', controller: dobController),
+                _buildDropdown(Icons.school, 'Select Class', classes, onChanged: (val) => _selectedClass = val),
+                _buildDropdown(Icons.book, 'Select Course', courses, onChanged: (val) => _selectedCourse = val),
 
-              _buildSectionTitle('👨‍👩‍👧 Parent Info'),
-              _buildField(Icons.person_outline, 'Parent Name', controller: parentNameController),
-              _buildField(Icons.phone, 'Phone Number', controller: phoneController, keyboardType: TextInputType.phone),
+                _buildSectionTitle('👨‍👩‍👧 Parent Info'),
+                _buildField(Icons.person_outline, 'Parent Name', controller: parentNameController),
+                _buildField(Icons.phone, 'Phone Number', controller: phoneController, keyboardType: TextInputType.phone),
 
-              _buildSectionTitle('💳 Payment Info'),
-              _buildDropdown(Icons.payment, 'Payment Method', paymentMethods, onChanged: (val) {
-                setState(() => _paymentMethod = val);
-              }),
-              _buildField(Icons.money, 'Amount (DA)', controller: amountController, keyboardType: TextInputType.number),
+                _buildSectionTitle('💳 Payment Info'),
+                _buildDropdown(Icons.payment, 'Payment Method', paymentMethods, onChanged: (val) {
+                  setState(() => _paymentMethod = val);
+                }),
+                _buildField(Icons.money, 'Amount (DA)', controller: amountController, keyboardType: TextInputType.number),
 
-              if (isCardPayment) ...[
-                _buildField(Icons.credit_card, 'Cardholder Name', controller: cardholderController),
-                _buildField(Icons.credit_card, 'Card Number', controller: cardNumberController, keyboardType: TextInputType.number),
-                _buildField(Icons.date_range, 'Expiry Date (MM/YY)', controller: expiryController),
-                _buildField(Icons.lock, 'CVV', controller: cvvController, keyboardType: TextInputType.number),
+                if (isCardPayment) ...[
+                  _buildField(Icons.credit_card, 'Cardholder Name', controller: cardholderController),
+                  _buildField(Icons.credit_card, 'Card Number', controller: cardNumberController, keyboardType: TextInputType.number),
+                  _buildField(Icons.date_range, 'Expiry Date (MM/YY)', controller: expiryController),
+                  _buildField(Icons.lock, 'CVV', controller: cvvController, keyboardType: TextInputType.number),
+                ],
+
+                SizedBox(height: 24),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.check_circle_outline),
+                  label: Text('Submit Registration'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    minimumSize: Size(double.infinity, 50),
+                    textStyle: TextStyle(fontSize: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      registerChildAndPayment();
+                    }
+                  },
+                )
               ],
-
-              SizedBox(height: 24),
-              ElevatedButton.icon(
-                icon: Icon(Icons.check_circle_outline),
-                label: Text('Submit Registration'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  minimumSize: Size(double.infinity, 50),
-                  textStyle: TextStyle(fontSize: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    registerChildAndPayment();
-                  }
-                },
-              )
-            ],
+            ),
           ),
         ),
       ),
@@ -167,6 +173,8 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
         controller: controller,
         style: const TextStyle(color: Colors.black),
         decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
           prefixIcon: Icon(icon, color: Colors.blueAccent),
           labelText: label,
           labelStyle: TextStyle(color: Colors.black),
@@ -183,6 +191,8 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
           prefixIcon: Icon(icon, color: Colors.blueAccent),
           labelText: label,
           labelStyle: TextStyle(color: Colors.black),
@@ -212,4 +222,3 @@ class _ChildRegistrationPageState extends State<ChildRegistrationPage> {
     );
   }
 }
-

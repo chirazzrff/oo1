@@ -48,84 +48,96 @@ class _StudentGradesScreenState extends State<StudentGradesScreen> {
     }
   }
 
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text("Mes Notes"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         foregroundColor: Colors.white,
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: fetchGrades(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        padding: const EdgeInsets.only(top: kToolbarHeight + 16, left: 12, right: 12, bottom: 12),
+        child: FutureBuilder<List<dynamic>>(
+          future: fetchGrades(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text("Erreur : ${snapshot.error}"));
-          }
+            if (snapshot.hasError) {
+              return Center(child: Text("Erreur : ${snapshot.error}"));
+            }
 
-          final grades = snapshot.data;
+            final grades = snapshot.data;
 
-          if (grades == null || grades.isEmpty) {
-            return const Center(child: Text("Aucune note disponible."));
-          }
+            if (grades == null || grades.isEmpty) {
+              return const Center(child: Text("Aucune note disponible."));
+            }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: grades.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.2,
-            ),
-            itemBuilder: (context, index) {
-              final grade = grades[index];
-              final subject = grade['subject'] ?? 'Inconnu';
-              final score = grade['grade']?.toString() ?? '--';
-              final date = grade['date']?.toString().split('T').first ?? '';
+            return GridView.builder(
+              itemCount: grades.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.2,
+              ),
+              itemBuilder: (context, index) {
+                final grade = grades[index];
+                final subject = grade['subject'] ?? 'Inconnu';
+                final score = grade['grade']?.toString() ?? '--';
+                final date = grade['date']?.toString().split('T').first ?? '';
 
-              return Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                elevation: 3,
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(getSubjectIcon(subject), size: 40, color: Colors.blue[900]),
-                      const SizedBox(height: 10),
-                      Text(
-                        subject,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue[900],
+                return Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 3,
+                  color: Colors.white.withOpacity(0.9),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(getSubjectIcon(subject), size: 40, color: Colors.blue[900]),
+                        const SizedBox(height: 10),
+                        Text(
+                          subject,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue[900],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Note : $score',
-                        style: TextStyle(fontSize: 14, color: Colors.black87),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Date : $date',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        Text(
+                          'Note : $score',
+                          style: const TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Date : $date',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

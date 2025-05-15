@@ -6,7 +6,12 @@ class CahierDeTexteScreen extends StatefulWidget {
 }
 
 class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
-  // Liste simulée des entrées du cahier de texte
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   List<Map<String, String>> entries = [
     {
       'title': 'Chapitre 1 : Addition',
@@ -18,7 +23,6 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
     },
   ];
 
-  // Fonction pour ajouter une nouvelle entrée
   void _addEntry() {
     showDialog(
       context: context,
@@ -28,28 +32,21 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
         return AlertDialog(
           title: Text('Ajouter une entrée', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(hintText: 'Titre'),
-                style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 10),
               TextField(
                 controller: contentController,
                 decoration: InputDecoration(hintText: 'Contenu'),
-                style: TextStyle(fontSize: 16),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Annuler', style: TextStyle(fontSize: 16)),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler')),
             TextButton(
               onPressed: () {
                 setState(() {
@@ -60,7 +57,7 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
                 });
                 Navigator.pop(context);
               },
-              child: Text('Ajouter', style: TextStyle(fontSize: 16, color: Colors.blue)),
+              child: Text('Ajouter', style: TextStyle(color: Colors.blue)),
             ),
           ],
         );
@@ -68,7 +65,6 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
     );
   }
 
-  // Fonction pour modifier une entrée
   void _editEntry(int index) {
     showDialog(
       context: context,
@@ -78,28 +74,15 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
         return AlertDialog(
           title: Text('Modifier l\'entrée', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(hintText: 'Titre'),
-                style: TextStyle(fontSize: 16),
-              ),
+              TextField(controller: titleController, decoration: InputDecoration(hintText: 'Titre')),
               SizedBox(height: 10),
-              TextField(
-                controller: contentController,
-                decoration: InputDecoration(hintText: 'Contenu'),
-                style: TextStyle(fontSize: 16),
-              ),
+              TextField(controller: contentController, decoration: InputDecoration(hintText: 'Contenu')),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Annuler', style: TextStyle(fontSize: 16)),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler')),
             TextButton(
               onPressed: () {
                 setState(() {
@@ -110,7 +93,7 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
                 });
                 Navigator.pop(context);
               },
-              child: Text('Modifier', style: TextStyle(fontSize: 16, color: Colors.blue)),
+              child: Text('Modifier', style: TextStyle(color: Colors.blue)),
             ),
           ],
         );
@@ -118,7 +101,6 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
     );
   }
 
-  // Fonction pour supprimer une entrée
   void _deleteEntry(int index) {
     setState(() {
       entries.removeAt(index);
@@ -129,64 +111,59 @@ class _CahierDeTexteScreenState extends State<CahierDeTexteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cahier de texte', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blue,
+        title: Text('Cahier de texte', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          // Ajouter une entrée
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _addEntry,
-              child: Text('Ajouter une entrée', style: TextStyle(fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(gradient: backgroundGradient),
+        child: Column(
+          children: [
+            SizedBox(height: kToolbarHeight + 16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _addEntry,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.indigo,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+                child: Text('Ajouter une entrée'),
               ),
             ),
-          ),
-          // Liste des entrées
-          Expanded(
-            child: ListView.builder(
-              itemCount: entries.length,
-              itemBuilder: (context, index) {
-                final entry = entries[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 5,
-                  child: ListTile(
-                    title: Text(entry['title']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    subtitle: Text(entry['content']!, style: TextStyle(fontSize: 16)),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        switch (value) {
-                          case 'Modifier':
-                            _editEntry(index);
-                            break;
-                          case 'Supprimer':
-                            _deleteEntry(index);
-                            break;
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem<String>(
-                          value: 'Modifier',
-                          child: Text('Modifier', style: TextStyle(fontSize: 16)),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'Supprimer',
-                          child: Text('Supprimer', style: TextStyle(fontSize: 16)),
-                        ),
-                      ],
+            Expanded(
+              child: ListView.builder(
+                itemCount: entries.length,
+                itemBuilder: (context, index) {
+                  final entry = entries[index];
+                  return Card(
+                    color: Colors.white.withOpacity(0.9),
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 5,
+                    child: ListTile(
+                      title: Text(entry['title']!, style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(entry['content']!),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (value) {
+                          if (value == 'Modifier') _editEntry(index);
+                          if (value == 'Supprimer') _deleteEntry(index);
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(value: 'Modifier', child: Text('Modifier')),
+                          PopupMenuItem(value: 'Supprimer', child: Text('Supprimer')),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

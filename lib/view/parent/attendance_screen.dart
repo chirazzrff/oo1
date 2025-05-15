@@ -12,6 +12,12 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   TextEditingController searchController = TextEditingController();
 
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   List<Map<String, dynamic>> students = [
     {"name": "Amine", "isPresent": true},
     {"name": "Nadia", "isPresent": false},
@@ -37,7 +43,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text(
           'Assiduité',
@@ -47,72 +52,80 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         centerTitle: true,
         elevation: 3,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // 🔎 Barre de recherche
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: "Rechercher un élève",
-                prefixIcon: const Icon(Icons.search, color: Colors.indigo),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // 🔎 Barre de recherche
+              TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  labelText: "Rechercher un élève",
+                  prefixIcon: const Icon(Icons.search, color: Colors.indigo),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: filterStudents,
+              ),
+              const SizedBox(height: 20),
+
+              // 📜 Liste des élèves
+              Expanded(
+                child: filteredStudents.isEmpty
+                    ? Center(
+                  child: Text(
+                    "Aucun élève trouvé.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey[200]),
+                  ),
+                )
+                    : ListView.builder(
+                  itemCount: filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    bool isPresent = filteredStudents[index]["isPresent"];
+
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        title: Text(
+                          filteredStudents[index]["name"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: isPresent ? Colors.green[100] : Colors.red[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            isPresent ? Icons.check : Icons.close,
+                            color: isPresent ? Colors.green : Colors.red,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              onChanged: filterStudents,
-            ),
-            const SizedBox(height: 20),
-
-            // 📜 Liste des élèves
-            Expanded(
-              child: filteredStudents.isEmpty
-                  ? Center(
-                child: Text(
-                  "Aucun élève trouvé.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: filteredStudents.length,
-                itemBuilder: (context, index) {
-                  bool isPresent = filteredStudents[index]["isPresent"];
-
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      title: Text(
-                        filteredStudents[index]["name"],
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: isPresent ? Colors.green[100] : Colors.red[100], // Fond léger
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          isPresent ? Icons.check : Icons.close,
-                          color: isPresent ? Colors.green : Colors.red,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

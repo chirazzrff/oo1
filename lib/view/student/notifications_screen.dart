@@ -63,6 +63,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       },
     );
   }
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   void _goToManageNotifications() {
     Navigator.push(

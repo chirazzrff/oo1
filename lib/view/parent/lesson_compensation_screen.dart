@@ -29,7 +29,8 @@ class _LessonCompensationScreenState extends State<LessonCompensationScreen> {
   void filterLessons(String query) {
     setState(() {
       filteredLessons = lessons
-          .where((lesson) => lesson["name"].toLowerCase().contains(query.toLowerCase()))
+          .where((lesson) =>
+          lesson["name"].toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -37,34 +38,47 @@ class _LessonCompensationScreenState extends State<LessonCompensationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           'Compensation des leçons',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: Colors.indigo,
         centerTitle: true,
-        elevation: 3,
+        backgroundColor: Colors.indigo.withOpacity(0.8),
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE8EAF6), Color(0xFF7986CB)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        padding: const EdgeInsets.only(top: kToolbarHeight + 24, left: 16, right: 16),
         child: Column(
           children: [
             // 🔎 Barre de recherche
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: "Rechercher une leçon",
-                prefixIcon: const Icon(Icons.search, color: Colors.indigo),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
-                ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                ],
               ),
-              onChanged: filterLessons,
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  hintText: "Rechercher une leçon",
+                  prefixIcon: Icon(Icons.search, color: Colors.indigo),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                ),
+                onChanged: filterLessons,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -74,37 +88,46 @@ class _LessonCompensationScreenState extends State<LessonCompensationScreen> {
                   ? Center(
                 child: Text(
                   "Aucune leçon trouvée.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
               )
                   : ListView.builder(
                 itemCount: filteredLessons.length,
                 itemBuilder: (context, index) {
-                  bool isCompensated = filteredLessons[index]["isCompensated"];
+                  final lesson = filteredLessons[index];
+                  final isCompensated = lesson["isCompensated"];
 
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 3)),
+                      ],
                     ),
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       title: Text(
-                        filteredLessons[index]["name"],
+                        lesson["name"],
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
                       ),
                       trailing: Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                         decoration: BoxDecoration(
-                          color: isCompensated ? Colors.green[100] : Colors.red[100], // Fond léger
+                          color: isCompensated
+                              ? Colors.green.withOpacity(0.1)
+                              : Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
-                          isCompensated ? Icons.check : Icons.close,
+                          isCompensated ? Icons.check_circle : Icons.cancel,
                           color: isCompensated ? Colors.green : Colors.red,
-                          size: 30,
+                          size: 28,
                         ),
                       ),
                     ),
@@ -112,7 +135,6 @@ class _LessonCompensationScreenState extends State<LessonCompensationScreen> {
                 },
               ),
             ),
-
           ],
         ),
       ),

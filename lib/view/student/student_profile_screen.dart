@@ -3,6 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+
+final Gradient backgroundGradient = const LinearGradient(
+  colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
+
 class StudentProfileScreen extends StatefulWidget {
   static const routeName = '/student-profile';
 

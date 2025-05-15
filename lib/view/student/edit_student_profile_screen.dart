@@ -44,6 +44,11 @@ class _EditStudentProfileScreenState extends State<EditStudentProfileScreen> {
       'phone': _phoneController.text,
     });
   }
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   @override
   Widget build(BuildContext context) {

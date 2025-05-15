@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-
 import 'package:printing/printing.dart';
 
 class EmploiDuTempsScreen extends StatefulWidget {
@@ -36,18 +35,16 @@ class _EmploiDuTempsScreenState extends State<EmploiDuTempsScreen> {
   void _showNotification(String message) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Notification', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          content: Text(message, style: TextStyle(fontSize: 16)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK', style: TextStyle(fontSize: 16, color: Colors.blue)),
-            ),
-          ],
-        );
-      },
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('Notification', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -95,79 +92,79 @@ class _EmploiDuTempsScreenState extends State<EmploiDuTempsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Emploi du temps', style: TextStyle(fontSize: 20)),
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.picture_as_pdf),
-            onPressed: _exportToPDF,
-            tooltip: 'Exporter en PDF',
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [Colors.lightBlueAccent, Colors.indigo]),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(onPressed: _previousWeek, icon: Icon(Icons.arrow_back)),
-                Text('Semaine: ${getWeekLabel()}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                IconButton(onPressed: _nextWeek, icon: Icon(Icons.arrow_forward)),
-              ],
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Emploi du temps', style: TextStyle(color: Colors.black87)),
+          backgroundColor: Colors.white.withOpacity(0.8),
+          elevation: 0,
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.picture_as_pdf, color: Colors.indigo),
+              onPressed: _exportToPDF,
+              tooltip: 'Exporter en PDF',
             ),
-          ),
-          Expanded(
-            child: ListView(
-              children: emploiDuTemps.keys.map((jour) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        jour,
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue),
-                      ),
-                    ),
-                    Column(
-                      children: emploiDuTemps[jour]!.map((item) {
-                        return Card(
-                          margin: EdgeInsets.symmetric(vertical: 8),
-                          elevation: 5,
+          ],
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(onPressed: _previousWeek, icon: Icon(Icons.arrow_back, color: Colors.white)),
+                  Text('Semaine: ${getWeekLabel()}',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                  IconButton(onPressed: _nextWeek, icon: Icon(Icons.arrow_forward, color: Colors.white)),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: emploiDuTemps.entries.map((entry) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(entry.key,
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                        SizedBox(height: 6),
+                        ...entry.value.map((item) => Card(
+                          color: Colors.white,
+                          elevation: 6,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                           child: ListTile(
                             leading: Icon(Icons.schedule, color: Colors.indigo),
-                            title: Text(
-                              '${item['matière']}',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                            ),
+                            title: Text('${item['matière']}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                             subtitle: Text(
                               'Horaire: ${item['horaire']} - Classe: ${item['classe']}',
-                              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                              style: TextStyle(color: Colors.grey[600]),
                             ),
                             trailing: IconButton(
-                              icon: Icon(Icons.notifications, size: 25, color: Colors.blue),
-                              onPressed: () {
-                                _showNotification('Le cours de ${item['matière']} a été modifié.');
-                              },
+                              icon: Icon(Icons.notifications, color: Colors.blue),
+                              onPressed: () => _showNotification('Le cours de ${item['matière']} a été modifié.'),
                             ),
                           ),
-                        );
-                      }).toList(),
+                        )),
+                        SizedBox(height: 12),
+                      ],
                     ),
-                    Divider(),
-                  ],
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

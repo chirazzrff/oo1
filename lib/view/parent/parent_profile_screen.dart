@@ -3,6 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'parent_home_screen.dart';
 
+final Gradient backgroundGradient = const LinearGradient(
+  colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
 class ParentProfileScreen extends StatefulWidget {
   static const String routeName = 'ParentProfileScreen';
 
@@ -132,112 +138,117 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      // Supprime backgroundColor ici pour éviter conflit avec gradient
       appBar: AppBar(
         title: const Text("Profil du Parent"),
         centerTitle: true,
         backgroundColor: Colors.indigo,
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildCard(
-                title: "Informations du parent",
-                children: [
-                  _buildTextField(
-                    label: 'Nom complet',
-                    icon: Icons.person,
-                    controller: _fullNameController,
-                    isRequired: true,
-                  ),
-                  _buildTextField(
-                    label: 'Email',
-                    icon: Icons.email,
-                    controller: _emailController,
-                    isRequired: true,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  _buildTextField(
-                    label: 'Téléphone',
-                    icon: Icons.phone,
-                    controller: _phoneController,
-                    isRequired: true,
-                    keyboardType: TextInputType.phone,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildCard(
-                title: "Informations des enfants",
-                children: [
-                  _buildTextField(
-                    label: 'Nombre d’enfants',
-                    icon: Icons.child_care,
-                    controller: TextEditingController(text: _numberOfChildren.toString()),
-                    keyboardType: TextInputType.number,
-                    isRequired: true,
-                    onChanged: (value) {
-                      final count = int.tryParse(value) ?? 1;
-                      if (count > 0 && count <= 10) {
-                        setState(() {
-                          _numberOfChildren = count;
-                          _initializeChildrenFields(count);
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  ...List.generate(_numberOfChildren, (index) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Enfant ${index + 1}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildCard(
+                  title: "Informations du parent",
+                  children: [
+                    _buildTextField(
+                      label: 'Nom complet',
+                      icon: Icons.person,
+                      controller: _fullNameController,
+                      isRequired: true,
+                    ),
+                    _buildTextField(
+                      label: 'Email',
+                      icon: Icons.email,
+                      controller: _emailController,
+                      isRequired: true,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    _buildTextField(
+                      label: 'Téléphone',
+                      icon: Icons.phone,
+                      controller: _phoneController,
+                      isRequired: true,
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildCard(
+                  title: "Informations des enfants",
+                  children: [
+                    _buildTextField(
+                      label: 'Nombre d’enfants',
+                      icon: Icons.child_care,
+                      controller: TextEditingController(text: _numberOfChildren.toString()),
+                      keyboardType: TextInputType.number,
+                      isRequired: true,
+                      onChanged: (value) {
+                        final count = int.tryParse(value) ?? 1;
+                        if (count > 0 && count <= 10) {
+                          setState(() {
+                            _numberOfChildren = count;
+                            _initializeChildrenFields(count);
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    ...List.generate(_numberOfChildren, (index) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enfant ${index + 1}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildTextField(
-                          label: 'Nom de l’enfant',
-                          icon: Icons.badge,
-                          controller: _childNameControllers[index],
-                          isRequired: true,
-                        ),
-                        _buildTextField(
-                          label: 'Année d’étude',
-                          icon: Icons.school,
-                          controller: _studyYearControllers[index],
-                          keyboardType: TextInputType.number,
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                    );
-                  }),
-                ],
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                          const SizedBox(height: 8),
+                          _buildTextField(
+                            label: 'Nom de l’enfant',
+                            icon: Icons.badge,
+                            controller: _childNameControllers[index],
+                            isRequired: true,
+                          ),
+                          _buildTextField(
+                            label: 'Année d’étude',
+                            icon: Icons.school,
+                            controller: _studyYearControllers[index],
+                            keyboardType: TextInputType.number,
+                            isRequired: true,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                  child: const Text(
+                    'Valider l’inscription',
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ),
-                child: const Text(
-                  'Valider l’inscription',
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

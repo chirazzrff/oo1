@@ -13,6 +13,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _emailNotificationEnabled = false;
   bool isLoading = true;
 
+  final Gradient backgroundGradient = const LinearGradient(
+    colors: [Color(0xFF8E9EFB), Color(0xFFB8C6DB)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +59,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         actions: [
           TextButton(
             onPressed: () async {
-              await supabase.from('notifications').update({'status': 'Lu'}).eq('id', notification['id']);
+              await supabase
+                  .from('notifications')
+                  .update({'status': 'Lu'})
+                  .eq('id', notification['id']);
               fetchUserNotifications();
               Navigator.pop(context);
             },
@@ -69,60 +78,73 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Notifications"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : notifications.isEmpty
-          ? Center(child: Text("Aucune notification"))
-          : ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notif = notifications[index];
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: BoxDecoration(gradient: backgroundGradient),
+        child: SafeArea(
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : notifications.isEmpty
+              ? Center(
+            child: Text(
+              "Aucune notification",
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
-            color: notif['status'] == 'Lu'
-                ? Colors.green.shade50
-                : Colors.red.shade50,
-            elevation: 3,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              contentPadding: EdgeInsets.all(12),
-              leading: Icon(
-                notif['category'] == 'Cours'
-                    ? Icons.book
-                    : notif['category'] == 'Examen'
-                    ? Icons.event
-                    : Icons.notifications,
+          )
+              : ListView.builder(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              final notif = notifications[index];
+              return Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 color: notif['status'] == 'Lu'
-                    ? Colors.green
-                    : Colors.red,
-                size: 30,
-              ),
-              title: Text(
-                notif['titre'],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                    ? Colors.white.withOpacity(0.85)
+                    : Colors.red.shade100.withOpacity(0.85),
+                elevation: 5,
+                margin:
+                EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(12),
+                  leading: Icon(
+                    notif['category'] == 'Cours'
+                        ? Icons.book
+                        : notif['category'] == 'Examen'
+                        ? Icons.event
+                        : Icons.notifications,
+                    color: notif['status'] == 'Lu'
+                        ? Colors.green
+                        : Colors.red,
+                    size: 30,
+                  ),
+                  title: Text(
+                    notif['titre'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      notif['contenu'],
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  trailing: Text(
+                    notif['date'],
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  onTap: () => _showNotificationDetails(notif),
                 ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  notif['contenu'],
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              trailing: Text(
-                notif['date'],
-                style: TextStyle(color: Colors.grey),
-              ),
-              onTap: () => _showNotificationDetails(notif),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
